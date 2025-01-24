@@ -1,18 +1,18 @@
 
-kea_container_image_tag: "2.7.5"
+kea_container_image_tag: "2.6"
 
 
 kea_ctrl_agent_enabled: true
-kea_ctrl_agent_container_image: "docker.cloudsmith.io/isc/docker/kea-dhcp4:{{kea_container_image_tag}}"
+kea_ctrl_agent_container_image: "docker.io/ccarney16/kea-dhcp:kea-{{kea_container_image_tag}}"
 
 kea_ddns_enabled: true
-kea_ddns_container_image: "docker.cloudsmith.io/isc/docker/kea-dhcp-ddns:{{kea_container_image_tag}}"
+kea_ddns_container_image: "docker.io/ccarney16/kea-dhcp:kea-{{kea_container_image_tag}}"
 
 kea_dhcp4_enabled: true
-kea_dhcp4_container_image: "docker.cloudsmith.io/isc/docker/kea-dhcp4:{{kea_container_image_tag}}"
+kea_dhcp4_container_image: "docker.io/ccarney16/kea-dhcp:kea-{{kea_container_image_tag}}"
 
 kea_dhcp6_enabled: true
-kea_dhcp6_container_image: "docker.cloudsmith.io/isc/docker/kea-dhcp6:{{kea_container_image_tag}}"
+kea_dhcp6_container_image: "docker.io/ccarney16/kea-dhcp:kea-{{kea_container_image_tag}}"
 
 kea_paths_home: "/srv/app/kea"
 kea_paths_config: "{{kea_paths_home}}/conf.d/kea"
