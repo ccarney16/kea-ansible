@@ -1,15 +1,146 @@
 
 kea_container_image_tag: "2.7.5"
 
-kea_agent_enabled: true
-kea_dhcp4_enabled: true
-kea_dhcp6_enabled: true
-kea_ddns_enabled: true
 
-kea_agent_container_image: "docker.cloudsmith.io/isc/docker/kea-dhcp4:{{key_container_image_tag}}"
-kea_ddns_container_image: "docker.cloudsmith.io/isc/docker/kea-dhcp-ddns:{{key_container_image_tag}}"
-kea_dhcp4_container_image: "docker.cloudsmith.io/isc/docker/kea-dhcp4:{{key_container_image_tag}}"
-kea_dhcp6_container_image: "docker.cloudsmith.io/isc/docker/kea-dhcp6:{{key_container_image_tag}}"
+kea_ctrl_agent_enabled: true
+kea_ctrl_agent_container_image: "docker.cloudsmith.io/isc/docker/kea-dhcp4:{{kea_container_image_tag}}"
+
+kea_ddns_enabled: true
+kea_ddns_container_image: "docker.cloudsmith.io/isc/docker/kea-dhcp-ddns:{{kea_container_image_tag}}"
+
+kea_dhcp4_enabled: true
+kea_dhcp4_container_image: "docker.cloudsmith.io/isc/docker/kea-dhcp4:{{kea_container_image_tag}}"
+
+kea_dhcp6_enabled: true
+kea_dhcp6_container_image: "docker.cloudsmith.io/isc/docker/kea-dhcp6:{{kea_container_image_tag}}"
 
 kea_paths_home: "/srv/app/kea"
 kea_paths_config: "{{kea_paths_home}}/conf.d/kea"
+
+#
+# DHCP configuration
+#
+
+kea_logging_pattern: !unsafe "%D{%Y-%m-%d %H:%M:%S.%q} %-5p [%c/%i.%t] %m\n"
+kea_logging_severity: "INFO"
+kea_logging_debuglevel: 0
+kea_logging_maxsize: 10485760  # 10 MB
+kea_logging_maxver: 3
+
+# Subnets
+kea_dhcp4_subnets: []
+kea_dhcp6_subnets: []
+
+kea_dhcp4_config:
+  Dhcp4:
+    dhcp-ddns:
+      enable-updates: true
+      qualifying-suffix: "home.arpa."
+
+    interfaces-config:
+      interfaces: []
+
+    control-sockets:
+    - socket-type: "unix"
+      socket-name: /run/kea/kea-dhcp4.sock
+
+    lease-database:
+      name: "/var/db/kea/dhcp4.leases"
+      persist: true
+      type: "memfile"
+
+    loggers:
+      - name: "kea-dhcp4"
+        severity: "{{kea_logging_severity}}"
+        output_options:
+          - output: "stdout"
+
+    rebind-timer: 2000
+    renew-timer: 1000
+    valid-lifetime: 4000
+
+    #subnet4: {{kea_dhcp4_subnets}}
+
+kea_dhcp6_config:
+  Dhcp6:
+    dhcp-ddns:
+      enable-updates: true
+      qualifying-suffix: "home.arpa."
+
+    interfaces-config:
+      interfaces: []
+
+    control-sockets:
+    - socket-type: "unix"
+      socket-name: /run/kea/kea-dhcp6.sock
+
+    lease-database:
+      name: "/var/db/kea/dhcp6.leases"
+      persist: true
+      type: "memfile"
+
+    loggers:
+      - name: "kea-dhcp6"
+        severity: "{{kea_logging_severity}}"
+        output_options:
+          - output: "stdout"
+
+    rebind-timer: 2000
+    renew-timer: 1000
+    valid-lifetime: 4000
+
+    #subnet6: {{kea_dhcp6_subnets}} 
+
+kea_dhcp_ddns_config:
+  DhcpDdns:
+    dns-server-timeout: 100
+    ip-address: "127.0.0.1"
+    ncr-format: "JSON"
+    ncr-protocol: "UDP"
+    port: 53001
+
+    control-sockets:
+    - socket-type: "unix"
+      socket-name: /run/kea/kea-dhcp6.sock
+
+    loggers:
+      - name: "kea-dhcp-ddns"
+        severity: "{{kea_logging_severity}}"
+        output_options:
+          - output: "stdout"
+
+    forward-ddns: {}
+    reverse-ddns: {}
+    tsig-keys: {}
+
+kea_ctrl_agent_config:
+  Control-agent:
+    http-host: "0.0.0.0"
+    http-port: 8000
+    # trust_anchor: "/path/to/the/ca-cert.pem"
+    # cert-file: "/path/to/the/agent-cert.pem"
+    # key-file: "/path/to/the/agent-key.pem"
+    # cert-required: true
+    # authentication:
+    #   type: "basic"
+    #   realm: kea-control-agent
+    #   clients:
+    #     - user: "admin"
+    #       password: "1234"
+    control-sockets:
+      dhcp4:
+        socket-type: "unix"
+        socket-name: "/run/kea-dhcp4.sock"
+      dhcp6:
+        socket-type: "unix"
+        socket-name: "/run/kea-dhcp6.sock"
+        user-context:
+          version: 3
+      d2:
+        socket-type: "unix"
+        socket-name: "/run/kea/kea-dhcp-ddns.sock"
+    loggers:
+      - name: "kea-ctrl-agent"
+        severity: "{{kea_logging_severity}}"
+        output_options:
+          - output: "stdout"

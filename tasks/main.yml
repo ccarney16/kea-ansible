@@ -1,0 +1,10 @@
+- name: Include tasks in deploy_base.yml
+  ansible.builtin.import_tasks: deploy_base.yml
+  tags:
+  - kea_setup
+
+- name: Include tasks in deploy_dhcp4.yml
+  ansible.builtin.import_tasks: deploy_dhcp4.yml
+  tags:
+  - kea_setup
+  

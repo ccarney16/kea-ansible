@@ -1,0 +1,27 @@
+- name: Copy Kea DHCPv4 service definitions
+  template:
+    src: "{{ item }}"
+    dest: "{{ kea_paths_home }}/{{ item | regex_replace('.j2', '') }}"
+    owner: "root"
+    group: "root"
+    mode: "0644"
+  with_items:
+  - kea-dhcp4.container.j2
+
+- name: Copy Kea DHCPv4 configuration files
+  template:
+    src: "config/{{ item }}"
+    dest: "{{ kea_paths_config }}/{{ item | regex_replace('.j2', '') }}"
+    owner: "root"
+    group: "root"
+    mode: "0644"
+  with_items:
+  - kea-dhcp4.conf.j2
+
+- name: Link Kea DHCPv4 services
+  file:
+    path: /etc/containers/systemd/kea/{{ item }}
+    state: link
+    src: "{{ kea_paths_home }}/{{ item }}"
+  with_items:
+  - kea-dhcp4.container

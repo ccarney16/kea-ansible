@@ -1,0 +1,47 @@
+# Ensures podman is installed
+- name: "Install dependencies (dnf)"
+  ansible.builtin.dnf:
+    name:
+    - podman
+    state: present
+
+- name: Create Kea project directories
+  file:
+    path: "{{ item }}"
+    state: directory
+  loop:
+  - "{{ kea_paths_home }}"
+  - "{{ kea_paths_config }}"
+  - "/etc/containers/systemd/kea"
+
+- name: Copy Kea base service definitions
+  template:
+    src: "{{ item }}"
+    dest: "{{ kea_paths_home }}/{{ item | regex_replace('.j2', '') }}"
+    owner: "root"
+    group: "root"
+    mode: "0644"
+  with_items:
+  - kea-ctrl-agent.container.j2
+  - kea-data.volume.j2
+  - kea-run.volume.j2
+
+- name: Copy Kea base configuration files
+  template:
+    src: "config/{{ item }}"
+    dest: "{{ kea_paths_config }}/{{ item | regex_replace('.j2', '') }}"
+    owner: "root"
+    group: "root"
+    mode: "0644"
+  with_items:
+  - kea-ctrl-agent.conf.j2
+
+- name: Link Kea base services
+  file:
+    path: /etc/containers/systemd/kea/{{ item }}
+    state: link
+    src: "{{ kea_paths_home }}/{{ item }}"
+  with_items:
+  - kea-ctrl-agent.container
+  - kea-run.volume
+  - kea-data.volume

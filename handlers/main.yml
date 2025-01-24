@@ -1,0 +1,20 @@
+- name: Reload Kea DHCP4 Service
+  service:
+    daemon-reload: true
+    name: kea-dhcp4
+    state: restarted
+- name: Reload Kea DHCP6 Service
+  service:
+    daemon-reload: true
+    name: kea-dhcp6
+    state: restarted
+- name: Reload Kea DDNS Service
+  service:
+    daemon-reload: true
+    name: kea-dhcp-ddns
+    state: restarted
+- name: Reload Kea Control Agent Service
+  service:
+    daemon-reload: true
+    name: kea-ctrl-agent
+    state: restarted

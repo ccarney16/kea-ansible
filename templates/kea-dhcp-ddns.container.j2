@@ -1,6 +1,5 @@
 [Unit]
 Description=Kea DHCP-DDNS Server
-Documentation=man:kea-dhcp-ddns(8)
 Wants=network-online.target
 After=network-online.target
 After=time-sync.target
@@ -10,8 +9,10 @@ ContainerName=kea-dhcp-ddns
 Exec="/usr/sbin/kea-dhcp-ddns -c /etc/kea/kea-dhcp-ddns.conf"
 Image={{ kea_ddns_container_image }}
 
-# TODO: Setup unified volume
 Tmpfs=/tmp
+Volume={{kea_paths_config}}:/etc/kea:ro,z
+Volume=kea-run.volume:/run/kea
+Volume=kea-data.volume:/kea
 
 # Networking Options
 Network=host

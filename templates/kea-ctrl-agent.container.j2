@@ -1,6 +1,5 @@
 [Unit]
 Description=Kea Control Agent
-Documentation=man:kea-ctrl-agent(8)
 Wants=network-online.target
 After=network-online.target
 After=time-sync.target
@@ -8,10 +7,13 @@ After=time-sync.target
 [Container]
 ContainerName=kea-ctrl-agent
 Exec="/usr/sbin/kea-ctrl-agent -c /etc/kea/kea-ctrl-agent.conf"
-Image={{ kea_agent_container_image }}
+Image={{ kea_ctrl_agent_container_image }}
 
-# TODO: Setup unified volume
+
 Tmpfs=/tmp
+Volume={{kea_paths_config}}:/etc/kea:ro,z
+Volume=kea-run.volume:/run/kea
+Volume=kea-data.volume:/kea
 
 # Networking Options
 Network=host
